@@ -2,7 +2,10 @@
 #define ALEXAHANDLER_H
 
 #include <Scheduler.h>
+#include "IrHandler.h"
+#include "RcHandler.h"
 #include "PcRemote.h"
+#include "RcHandler.h"
 #include "TvRemote.h"
 #include "Switch.h"
 #include "UpnpBroadcastResponder.h"
@@ -34,9 +37,9 @@ void AlexaHandler::setup() {
 
   // Define your switches here. Max 10
   // Format: Alexa invocation name, local port no, on callback, off callback
-  pc = new Switch(F("Computer Steckdose"), 81, pcOn, pcOff);
-  tv = new Switch(F("Fernsehr"), 85, tvOn, tvOff);
-  netflix = new Switch(F("Netflix"), 86, netflixOn, netflixOff);
+  pc = new Switch(F("Steckdose Computer"), 81, pcOn, pcOff);
+  tv = new Switch(F("TaskFlow Fernsehen"), 85, tvOn, tvOff);
+  netflix = new Switch(F("TaskFlow Netflix"), 86, netflixOn, netflixOff);
 
   Serial.println(F("Adding switches upnp broadcast responder"));
   upnpBroadcastResponder.addDevice(*pc);
@@ -49,6 +52,9 @@ void AlexaHandler::loop() {
   pc->serverLoop();
   tv->serverLoop();
   netflix->serverLoop();
+
+  IrHandler::loop();
+  RcHandler::loop();
 }
 
 bool AlexaHandler::pcOn() {

@@ -3,8 +3,10 @@
 
 // --- pins ---
 #define SERIAL_BAUD 115200
-#define IR_PIN      16   // esp8862 pin D0
-#define RC_PIN      4    // esp8862 pin D2
+#define IR_SND_PIN  16   // esp8862 pin D0
+#define IR_RCV_PIN  0    // esp8862 pin D3
+#define RC_SND_PIN  4    // esp8862 pin D2
+#define RC_RCV_PIN  5    // esp8862 pin D1
 #define RF_CE_PIN   2    // esp8862 pin D4 or D8
 #define RF_CSN_PIN  15   // esp8862 pin D4 or D8
 

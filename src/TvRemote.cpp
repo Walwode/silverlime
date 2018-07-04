@@ -61,10 +61,6 @@ void TvRemote::loop() {
       case SAMSUNG_SMARTHUB: IrHandler::samsungSmartHub(); break;
       case SAMSUNG_OK: IrHandler::samsungOk(); break;
       case RECEIVER_POWER: IrHandler::receiverPower(); break;
-        // IrHandler::receiverPower1();
-        // delay(200);
-        // IrHandler::receiverPower2();
-        // break;
     }
     delay(action->getDuration());
   } else delay(100);

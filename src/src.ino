@@ -13,7 +13,7 @@
 
 AlexaHandler alexaHandler;
 PcRemote pcRemote;
-RedMapleHub redMapleHub;
+// RedMapleHub redMapleHub;
 TvRemote tvRemote;
 bool connectWifi();
 
@@ -24,12 +24,12 @@ void setup()
 {
   Serial.begin(SERIAL_BAUD, SERIAL_8N1, SERIAL_TX_ONLY);
   while(!connectWifi());
-  IrHandler::setup(IR_PIN); // esp8862 pin D2
-  RcHandler::setup(RC_PIN); // esp8862 pin D0
+  IrHandler::setup(IR_SND_PIN, IR_RCV_PIN);
+  RcHandler::setup(RC_SND_PIN, RC_RCV_PIN);
   
   Scheduler.start(&alexaHandler);
   Scheduler.start(&pcRemote);
-  Scheduler.start(&redMapleHub);
+  // Scheduler.start(&redMapleHub);
   Scheduler.start(&tvRemote);
 }
 
