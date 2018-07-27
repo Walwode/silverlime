@@ -12,14 +12,10 @@ public:
   static char* bin2tristate(const char* bin);
   static char* dec2binWzerofill(unsigned long Dec, unsigned int bitLength);
 
-  static void powerOnCh1();
-  static void powerOffCh1();
-  static void powerOnCh2();
-  static void powerOffCh2();
-  static void powerOnCh3();
-  static void powerOffCh3();
-  static void powerOnCh4();
-  static void powerOffCh4();
+  static void powerOnF1();
+  static void powerOffF1();
+  static void powerOnF2();
+  static void powerOffF2();
 };
 #endif
 

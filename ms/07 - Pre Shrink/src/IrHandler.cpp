@@ -12,7 +12,7 @@ IRrecv *irrecv = NULL; // set the GPIO to be used to reveice the message
 decode_results results;  // Somewhere to store the results
 
 void IrHandler::setup(byte sndPin, byte rcvPin) {
-  Serial.print(F("Initialize infrared... "));
+  Serial.println(F("Initialize infrared"));
   irsend = new IRsend(sndPin);
   irsend->begin();
 
@@ -21,13 +21,10 @@ void IrHandler::setup(byte sndPin, byte rcvPin) {
   irrecv->setUnknownThreshold(12); // Ignore messages with less than minimum on or off pulses.
 #endif  // DECODE_HASH
   irrecv->enableIRIn();  // Start the receiver
-  Serial.println(F("done"));
 }
 
 void IrHandler::sendRaw(uint16_t rawData[]) {
-  noInterrupts();
   irsend->sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.  
-  interrupts();
   yield();
 }
 
@@ -51,14 +48,10 @@ void IrHandler::samsungOk() {
 
 void IrHandler::receiverPower() {
   Serial.println(F("IR Receiver Power"));
-  uint16_t receiverPower[21] = IR_RECEIVER_POWER;
-  sendRaw(receiverPower);
-  /*
   uint16_t receiverPower1[21] = IR_RECEIVER_POWER_1;
   for (int i = 0; i < 5; i++) sendRaw(receiverPower1);
   uint16_t receiverPower2[21] = IR_RECEIVER_POWER_2;
   for (int i = 0; i < 5; i++) sendRaw(receiverPower2);
-  */
 }
 
 void IrHandler::loop() {

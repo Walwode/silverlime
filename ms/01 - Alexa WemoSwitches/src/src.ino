@@ -6,19 +6,19 @@
 #include "credentials.h"
 #include "UpnpBroadcastResponder.h"
 #include "CallbackFunction.h"
+#include "FastLED.h"
+
+#define NUM_LEDS 176
+#define DATA_PIN 3
+CRGB leds[NUM_LEDS];
+// 36
 
 // prototypes
 boolean connectWifi();
 
 // on/off callbacks 
-bool TvPowerOn();
-bool TvPowerOff();
-bool ComputerPowerOn();
-bool ComputerPowerOff();
-bool TvOn();
-bool TvOff();
-bool NetflixOn();
-bool NetflixOff();
+bool kitchenStripOn();
+bool kitchenStripOff();
 
 // Change this before you flash
 const char* ssid = WIFI_SSID;
@@ -28,19 +28,13 @@ boolean wifiConnected = false;
 
 UpnpBroadcastResponder upnpBroadcastResponder;
 
-Switch *tvPower = NULL;
-Switch *computerPower = NULL;
-Switch *tv = NULL;
-Switch *netflix = NULL;
+Switch *kitchenStrip = NULL;
 
-bool isTvPowerOn = false;
-bool isComputerPowerOn = false;
-bool isTvOn = false;
-bool isNetflixOn = false;
+bool isKitchenStripOn = false;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
    
   // Initialise wifi connection
   wifiConnected = connectWifi();
@@ -50,17 +44,16 @@ void setup()
     
     // Define your switches here. Max 10
     // Format: Alexa invocation name, local port no, on callback, off callback
-    tvPower = new Switch("TV Steckdose", 80, tvPowerOn, tvPowerOn);
-    computerPower = new Switch("Computer Steckdose", 81, computerPowerOn, computerPowerOff);
-    tv = new Switch("Fernsehr", 85, tvOn, tvOff);
-    netflix = new Switch("Netflix", 86, netflixOn, netflixOff);
+    kitchenStrip = new Switch("Kitchen Strip", 80, kitchenStripOn, kitchenStripOff);
 
     Serial.println("Adding switches upnp broadcast responder");
-    upnpBroadcastResponder.addDevice(*tvPower);
-    upnpBroadcastResponder.addDevice(*computerPower);
-    upnpBroadcastResponder.addDevice(*tv);
-    upnpBroadcastResponder.addDevice(*netflix);
+    upnpBroadcastResponder.addDevice(*kitchenStrip);
   }
+  
+  FastLED.setBrightness(200);
+  // FastLED.setMaxPowerInVoltsAndMilliamps(5, 1000); 
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  kitchenStripOn();
 }
  
 void loop()
@@ -68,67 +61,36 @@ void loop()
 	 if(wifiConnected){
       upnpBroadcastResponder.serverLoop();
       
-      tvPower->serverLoop();
-      computerPower->serverLoop();
-      tv->serverLoop();
-      netflix->serverLoop();
+      kitchenStrip->serverLoop();
 	 }
 }
 
-bool tvPowerOn() {
-    Serial.println("Switch TV power plug on ...");
-    
-    isTvPowerOn = true;    
-    return isTvPowerOn;
+void blackStrip() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Black;
+  }
 }
 
-bool tvPowerOff() {
-    Serial.println("Switch TV power plug off ...");
-
-    isTvPowerOn = false;
-    return isTvPowerOn;
+bool kitchenStripOn() {
+  Serial.println("Switch kitchen strip on ...");
+  
+  isKitchenStripOn = true;
+  blackStrip();
+  for (int i = 0; i < 36; i++) {
+    leds[i] = CRGB::White;
+    // leds[NUM_LEDS - i - 1] = CRGB::White;;
+  }
+  FastLED.show();
+  return isKitchenStripOn;
 }
 
-bool computerPowerOn() {
-    Serial.println("Switch computer power plug on ...");
+bool kitchenStripOff() {
+  Serial.println("Switch kitchen strip off ...");
 
-    isComputerPowerOn = true;
-    return isComputerPowerOn;
-}
-
-bool computerPowerOff() {
-    Serial.println("Switch computer power plug off ...");
-
-  isComputerPowerOn = false;
-  return isComputerPowerOn;
-}
-
-bool tvOn() {
-    Serial.println("Switch TV and receiver on ...");
-
-    isTvOn = true;
-    return isTvOn;
-}
-
-bool tvOff() {
-    Serial.println("Switch TV and receiver off ...");
-
-  isTvOn = false;
-  return isTvOn;
-}
-
-bool netflixOn() {
-    Serial.println("Switch TV and netflix on ...");
-
-    isNetflixOn = true;
-    return isNetflixOn;
-}
-
-bool netflixOff() {
-    Serial.println("Switch TV and netflix off ...");
-
-  isNetflixOn = false;
-  return isNetflixOn;
+  isKitchenStripOn = false;
+  blackStrip();
+  FastLED.show();
+  return isKitchenStripOn;
 }
 
 // connect to wifi – returns true if successful or false if not

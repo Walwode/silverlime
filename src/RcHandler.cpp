@@ -2,47 +2,68 @@
 #include "Configuration.h"
 #include "RcHandler.h"
 
-RCSwitch rcSwitch = RCSwitch();
-RCSwitch rcSwitchRcv = RCSwitch();
+RCSwitch *rcSwitch = NULL;
 
 void RcHandler::setup(byte sndPin, byte rcvPin, int protocol, int pulseLength) {
-  Serial.println(F("Initialize 433MHz switches"));
-  rcSwitch.enableTransmit(sndPin);
-  rcSwitch.enableReceive(rcvPin);
-  rcSwitch.setProtocol(protocol);
-  rcSwitch.setPulseLength(pulseLength);
+  Serial.print(F("Initialize 433MHz switches... "));
+  rcSwitch = new RCSwitch();
+  rcSwitch->enableTransmit(sndPin);
+  rcSwitch->enableReceive(rcvPin);
+  rcSwitch->setProtocol(protocol);
+  rcSwitch->setPulseLength(pulseLength);
+  Serial.println(F("done"));
 }
 
-void RcHandler::powerOnF1() {
-  Serial.println(F("RC Power On F1"));
-  rcSwitch.send(RC_POWER_ON_F1);
+void RcHandler::powerOnCh1() {
+  Serial.println(F("RC Power On Channel 1"));
+  rcSwitch->send(RC_POWER_ON_CH1);
 }
 
-void RcHandler::powerOffF1() {
-  Serial.println(F("RC Power Off F1"));
-  rcSwitch.send(RC_POWER_OFF_F1);
+void RcHandler::powerOffCh1() {
+  Serial.println(F("RC Power Off Channel 1"));
+  rcSwitch->send(RC_POWER_OFF_CH1);
 }
 
-void RcHandler::powerOnF2() {
-  Serial.println(F("RC Power On F2"));
-  rcSwitch.send(RC_POWER_ON_F2);
+void RcHandler::powerOnCh2() {
+  Serial.println(F("RC Power On Channel 2"));
+  rcSwitch->send(RC_POWER_ON_CH2);
 }
 
-void RcHandler::powerOffF2() {
-  Serial.println(F("RC Power Off F2"));
-  rcSwitch.send(RC_POWER_OFF_F2);
+void RcHandler::powerOffCh2() {
+  Serial.println(F("RC Power Off Channel 2"));
+  rcSwitch->send(RC_POWER_OFF_CH2);
+}
+
+void RcHandler::powerOnCh3() {
+  Serial.println(F("RC Power On Channel 3"));
+  rcSwitch->send(RC_POWER_ON_CH3);
+}
+
+void RcHandler::powerOffCh3() {
+  Serial.println(F("RC Power Off Channel 3"));
+  rcSwitch->send(RC_POWER_OFF_CH3);
+}
+
+void RcHandler::powerOnCh4() {
+  Serial.println(F("RC Power On Channel 4"));
+  rcSwitch->send(RC_POWER_ON_CH4);
+}
+
+void RcHandler::powerOffCh4() {
+  Serial.println(F("RC Power Off Channel 4"));
+  rcSwitch->send(RC_POWER_OFF_CH4);
 }
 
 void RcHandler::loop() {
-  if (rcSwitch.available()) {
+  if (rcSwitch->available()) {
     Serial.println(F("[433MHz] >> Signal received:"));
     output(
-      rcSwitch.getReceivedValue(),
-      rcSwitch.getReceivedBitlength(),
-      rcSwitch.getReceivedDelay(),
-      rcSwitch.getReceivedRawdata(),
-      rcSwitch.getReceivedProtocol());
-    rcSwitch.resetAvailable();
+      rcSwitch->getReceivedValue(),
+      rcSwitch->getReceivedBitlength(),
+      rcSwitch->getReceivedDelay(),
+      rcSwitch->getReceivedRawdata(),
+      rcSwitch->getReceivedProtocol());
+    rcSwitch->resetAvailable();
     Serial.println(F("[433MHz] << Signal received"));
   }
 }
@@ -50,24 +71,24 @@ void RcHandler::loop() {
 void RcHandler::output(unsigned long decimal, unsigned int length, unsigned int delay, unsigned int* raw, unsigned int protocol) {
 
   const char* b = dec2binWzerofill(decimal, length);
-  Serial.print("Decimal: ");
+  Serial.print(F("Decimal: "));
   Serial.print(decimal);
-  Serial.print(" (");
-  Serial.print( length );
-  Serial.print("Bit) Binary: ");
-  Serial.print( b );
-  Serial.print(" Tri-State: ");
-  Serial.print( bin2tristate( b) );
-  Serial.print(" PulseLength: ");
+  Serial.print(F(" ("));
+  Serial.print(length);
+  Serial.print(F("Bit) Binary: "));
+  Serial.print(b);
+  Serial.print(F(" Tri-State: "));
+  Serial.print(bin2tristate( b));
+  Serial.print(F(" PulseLength: "));
   Serial.print(delay);
-  Serial.print(" microseconds");
-  Serial.print(" Protocol: ");
+  Serial.print(F(" microseconds"));
+  Serial.print(F(" Protocol: "));
   Serial.println(protocol);
   
-  Serial.print("Raw data: ");
+  Serial.print(F("Raw data: "));
   for (unsigned int i=0; i<= length*2; i++) {
     Serial.print(raw[i]);
-    Serial.print(",");
+    Serial.print(F(","));
   }
   Serial.println();
 }
