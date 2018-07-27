@@ -17,48 +17,37 @@ void IrHandler::setup(byte sndPin, byte rcvPin) {
   irsend->begin();
 
   irrecv = new IRrecv(rcvPin, CAPTURE_BUFFER_SIZE, 15U, true);
-#if DECODE_HASH
   irrecv->setUnknownThreshold(12); // Ignore messages with less than minimum on or off pulses.
-#endif  // DECODE_HASH
   irrecv->enableIRIn();  // Start the receiver
   Serial.println(F("done"));
 }
 
 void IrHandler::sendRaw(uint16_t rawData[]) {
   noInterrupts();
-  irsend->sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.  
+  irsend->sendRaw(rawData, sizeof(rawData), 38);  // Send a raw data capture at 38kHz.  
   interrupts();
   yield();
 }
 
 void IrHandler::samsungPower() {
   Serial.println(F("IR Samsung Power"));
-  uint16_t samsungPower[135] = IR_SAMSUNG_POWER;  // SAMSUNG E0E040BF
-  sendRaw(samsungPower);
+  irsend->sendSAMSUNG(IR_SAMSUNG_POWER);
 }
 
 void IrHandler::samsungSmartHub() {
   Serial.println(F("IR Samsung Smart Hub"));
-  uint16_t samsungSmartHub[135] = IR_SAMSUNG_SMARTHUB;  // SAMSUNG E0E09E61
-  sendRaw(samsungSmartHub);
+  irsend->sendSAMSUNG(IR_SAMSUNG_SMARTHUB);
 }
 
 void IrHandler::samsungOk() {
   Serial.println(F("IR Samsung OK"));
-  uint16_t samsungOk[135] = IR_SAMSUNG_OK;  // SAMSUNG E0E016E9
-  sendRaw(samsungOk);
+  irsend->sendSAMSUNG(IR_SAMSUNG_OK);
 }
 
 void IrHandler::receiverPower() {
   Serial.println(F("IR Receiver Power"));
-  uint16_t receiverPower[21] = IR_RECEIVER_POWER;
-  sendRaw(receiverPower);
-  /*
-  uint16_t receiverPower1[21] = IR_RECEIVER_POWER_1;
-  for (int i = 0; i < 5; i++) sendRaw(receiverPower1);
-  uint16_t receiverPower2[21] = IR_RECEIVER_POWER_2;
-  for (int i = 0; i < 5; i++) sendRaw(receiverPower2);
-  */
+  irsend->sendRC5(IR_RECEIVER_POWER_1);
+  irsend->sendRC5(IR_RECEIVER_POWER_2);
 }
 
 void IrHandler::loop() {

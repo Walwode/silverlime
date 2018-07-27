@@ -57,8 +57,8 @@ void loop() {
   switchTv.serverLoop();
   switchNetflix.serverLoop();
 
-  IrHandler::loop();
-  RcHandler::loop();
+  // IrHandler::loop();
+  // RcHandler::loop();
   doTaskActionStack();
 }
 
