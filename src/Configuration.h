@@ -6,7 +6,7 @@
 #define IR_SND_PIN  5   // esp8862 pin D0 = 16
 #define IR_RCV_PIN  0    // esp8862 pin D3 = 0
 #define RC_SND_PIN  4    // esp8862 pin D2 = 4
-#define RC_RCV_PIN  16    // esp8862 pin D1 = 5
+#define RC_RCV_PIN  15    // esp8862 pin D1 = 5
 #define RF_CE_PIN   2    // esp8862 pin D4 or D8
 #define RF_CSN_PIN  15   // esp8862 pin D4 or D8
 
