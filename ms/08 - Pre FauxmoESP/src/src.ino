@@ -1,11 +1,14 @@
+// blynk auth ecdfec7c8f8b447896337d1a5c783cb2
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <fauxmoESP.h>
 #include <LinkedList.h>
 #include "Configuration.h"
 #include "IrHandler.h"
 #include "RemoteAction.h"
 #include "RcHandler.h"
+#include "Switch.h"
+#include "UpnpBroadcastResponder.h"
 
 const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASS;
@@ -23,7 +26,13 @@ bool alexaCh4Off();
 bool alexaTvOff();
 bool alexaNetflixOff();
 
-fauxmoESP fauxmo;
+UpnpBroadcastResponder upnpBroadcastResponder;
+Switch switchChannel1("POWPL-CH1", 80, alexaCh1On, alexaCh1Off);
+Switch switchChannel2("POWPL-CH2", 81, alexaCh2On, alexaCh2Off);
+Switch switchChannel3("POWPL-CH3", 82, alexaCh3On, alexaCh3Off);
+Switch switchChannel4("POWPL-CH4", 83, alexaCh4On, alexaCh4Off);
+Switch switchTv("TFLOW-TV", 85, alexaTvOn, alexaTvOff);
+Switch switchNetflix("TFLOW-NTFLX", 86, alexaNetflixOn, alexaNetflixOff);
 
 LinkedList<RemoteAction*> taskActionStack = LinkedList<RemoteAction*>();
 RemoteAction *remoteAction = NULL;
@@ -39,12 +48,18 @@ void setup() {
 }
 
 void loop() {
-  fauxmo.handle();
+  upnpBroadcastResponder.serverLoop();
   
+  switchChannel1.serverLoop();
+  switchChannel2.serverLoop();
+  switchChannel3.serverLoop();
+  switchChannel4.serverLoop();
+  switchTv.serverLoop();
+  switchNetflix.serverLoop();
+
   // IrHandler::loop();
   // RcHandler::loop();
   doTaskActionStack();
-  delay(10);
 }
 
 void doTaskActionStack() {
@@ -75,40 +90,15 @@ void setActionDelay(int duration) {
 
 void initializeAlexa() {
   Serial.print(F("Initialize Alexa... "));
+  upnpBroadcastResponder.beginUdpMulticast();
   
-  fauxmo.enable(true);
-  fauxmo.enable(false);
-  fauxmo.enable(true);
-  
-  fauxmo.addDevice("POWPL-CH1");
-  fauxmo.addDevice("POWPL-CH2");
-  fauxmo.addDevice("POWPL-CH3");
-  fauxmo.addDevice("POWPL-CH4");
-  fauxmo.addDevice("TFLOW-TV");
-  fauxmo.addDevice("TFLOW-NTFLX");
-
-  fauxmo.onSetState([](unsigned char device_id, const char * device_name, bool state, unsigned char value) {
-    Serial.printf("[MAIN] Device #%d (%s) state: %s value: %d\n", device_id, device_name, state ? "ON" : "OFF", value);
-    if (strcmp(device_name, "POWPL-CH1") == 0) {
-      state ? alexaCh1On() : alexaCh1Off();
-    }
-    if (strcmp(device_name, "POWPL-CH2") == 0) {
-      state ? alexaCh2On() : alexaCh2Off();
-    }
-    if (strcmp(device_name, "POWPL-CH3") == 0) {
-      state ? alexaCh3On() : alexaCh3Off();
-    }
-    if (strcmp(device_name, "POWPL-CH4") == 0) {
-      state ? alexaCh4On() : alexaCh4Off();
-    }
-    if (strcmp(device_name, "TFLOW-TV") == 0) {
-      state ? alexaTvOn() : alexaTvOff();
-    }
-    if (strcmp(device_name, "TFLOW-NTFLX") == 0) {
-      state ? alexaNetflixOn() : alexaNetflixOff();
-    }
-  });
-  
+  // Adding switches upnp broadcast responder
+  upnpBroadcastResponder.addDevice(switchChannel1);
+  upnpBroadcastResponder.addDevice(switchChannel2);
+  upnpBroadcastResponder.addDevice(switchChannel3);
+  upnpBroadcastResponder.addDevice(switchChannel4);
+  upnpBroadcastResponder.addDevice(switchTv);
+  upnpBroadcastResponder.addDevice(switchNetflix);
   Serial.println(F("done"));
 }
 
