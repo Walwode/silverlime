@@ -11,3 +11,6 @@ Uncomment IrHandler::loop(); in general loop() function to enable recording of i
 
 ### 433MHz
 Uncomment RcHandler::loop(); in the general loop() function to enable record of 433MHz signals. The record values are printed to the serial monitor.
+
+## Information
+The Echo Dot must be on power to understand the fauxmoESP devices as lamps. Else they will be only recognized as "Phillips Electronis" and can't be switched on/off.
